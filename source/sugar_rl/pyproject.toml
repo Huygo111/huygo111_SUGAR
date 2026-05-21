@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "toml"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sugar_rl"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "argcomplete",
+    "prettytable",
+    "numpy==1.26.0",
+    "psutil",
+]
