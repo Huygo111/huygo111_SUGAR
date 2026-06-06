@@ -62,16 +62,17 @@ python scripts/sugar_rl/process_tracker_rollout.py  --data_dir "outputs/${TASK_N
 
 # training generator
 case "${TASK_NAME}" in
-    "CarryBox" | "PickBox" | "PushBox")
+    "CarryBox" | "PushBox")
         USE_TARGET="True"
         ;;
-    "PickBottle" | "StandBottle" | "SitChair")
+    "KickBox" | "PickBottle" | "StandBottle" | "SitChair")
         USE_TARGET="False"
         ;;
     *)
+        echo "Unsupported TASK_NAME for generator config: ${TASK_NAME}"
+        exit 1
 esac
 
 python scripts/sugar_il/train.py  --config-name train_generator_workspace.yaml task="${TASK_NAME}" use_target=${USE_TARGET} num_epochs=1001 log_path="outputs/${TASK_NAME}_${EXP_NAME}/logs/generator" dataset_path="outputs/${TASK_NAME}_${EXP_NAME}/rollout_datasets/tracker/il_dataset"
 
 cp "outputs/${TASK_NAME}_${EXP_NAME}/logs/generator/epoch_checkpoints/epoch=1000.ckpt" "outputs/${TASK_NAME}_${EXP_NAME}/ckpts/generator.ckpt"
-
