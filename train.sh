@@ -1,14 +1,17 @@
 
+set -euo pipefail
+
 TASK_NAME=$1
 CURRENT_TIME=$(date +"%Y%m%d_%H%M%S")
 EXP_NAME=${2:-$CURRENT_TIME}
+ISAACLAB_LAUNCHER=${ISAACLAB_LAUNCHER:-"$HOME/IsaacLab/isaaclab.sh"}
 
 
 # mkdir -p "outputs/ckpts/${TASK_NAME}"
 mkdir -p "outputs/${TASK_NAME}_${EXP_NAME}/ckpts"
 
 # training refiner
-python scripts/sugar_rl/train.py \
+"${ISAACLAB_LAUNCHER}" -p scripts/sugar_rl/train.py \
     --task "Sugar-G129dof-${TASK_NAME}-Refiner" \
     --num_envs 4096 \
     --log_dir "outputs/${TASK_NAME}_${EXP_NAME}/logs/refiner" \
@@ -19,7 +22,7 @@ python scripts/sugar_rl/train.py \
 cp "outputs/${TASK_NAME}_${EXP_NAME}/logs/refiner/model_30000.pt" "outputs/${TASK_NAME}_${EXP_NAME}/ckpts/refiner.pt"
 
 # rollout refiner for training tracker
-python scripts/sugar_rl/play.py \
+"${ISAACLAB_LAUNCHER}" -p scripts/sugar_rl/play.py \
     --task "Sugar-G129dof-${TASK_NAME}-Refiner-Rollout" \
     --num_envs 1000 \
     --checkpoint "outputs/${TASK_NAME}_${EXP_NAME}/ckpts/refiner.pt" \
@@ -33,7 +36,7 @@ python scripts/sugar_rl/process_refiner_rollout.py \
 
 
 # training tracker
-python scripts/sugar_rl/train.py \
+"${ISAACLAB_LAUNCHER}" -p scripts/sugar_rl/train.py \
     --task "Sugar-G129dof-${TASK_NAME}-Tracker" \
     --num_envs 4096 \
     --teacher_ckpt "outputs/${TASK_NAME}_${EXP_NAME}/ckpts/refiner.pt" \
@@ -47,7 +50,7 @@ cp "outputs/${TASK_NAME}_${EXP_NAME}/logs/tracker/model_30000.pt" "outputs/${TAS
 
 
 # rollout tracker for training generator
-python scripts/sugar_rl/play.py \
+"${ISAACLAB_LAUNCHER}" -p scripts/sugar_rl/play.py \
     --task "Sugar-G129dof-${TASK_NAME}-Tracker-Rollout" \
     --checkpoint="outputs/${TASK_NAME}_${EXP_NAME}/ckpts/tracker.pt" \
     --num_envs 1000 \
